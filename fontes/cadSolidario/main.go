@@ -7,9 +7,11 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
+	"github.com/mccaetano/cadSolidario/controller"
 )
 
 func main() {
+
 	port := os.Getenv("PORT")
 
 	if port == "" {
@@ -19,11 +21,10 @@ func main() {
 	router := gin.Default()
 	router.Use(gin.Logger())
 
-	router.GET("/hello", func(c *gin.Context) {
-		c.String(200, "Hello World")
-	})
-
-	router.Group("/api")
+	api := router.Group("/api")
+	api.GET("/calendar", controller.HandleGETCalendar)
+	api.POST("/calendar", controller.HandlePOSTCalendar)
+	api.PUT("/calendar/{id}", controller.HandlePUTCalendar)
 
 	router.Use(static.Serve("/", static.LocalFile("./static", true)))
 
