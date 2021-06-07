@@ -1,100 +1,55 @@
 package controller
 
 import (
-	"database/sql"
-	"fmt"
-	"os"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mccaetano/cadSolidario/models"
 )
 
-func HandleGETCalendar(c *gin.Context) {
-	cals, err := getByFilter(c.Query("startEventDate"), c.Query("endEventDate"), c.Query("status"))
+func GetByFilter(c *gin.Context) {
+	dateStart, err := time.Parse("2006-03-01", c.Query("startEventDate"))
+	if err != nil {
+		dateStart, _ = time.Parse("2006-03-01", "1900-01-01")
+	}
+	dateEnd, err := time.Parse("2006-03-01", c.Query("endEventDate"))
+	if err != nil {
+		dateEnd, _ = time.Parse("2006-03-01", "1900-01-01")
+	}
+	cals, err := models.SchedulerGetByFilter(dateStart, dateEnd, c.Query("status"))
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(200, cals)
 }
 
-func HandlePOSTCalendar(c *gin.Context) {
-	cals, err := getByFilter(c.Query("startEventDate"), c.Query("endEventDate"), c.Query("status"))
+func GetById(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Query("status"), 10, 64)
+	cals, err := models.SchedulerGetById(id)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(200, cals)
 }
 
-func HandlePUTCalendar(c *gin.Context) {
-	cals, err := getByFilter(c.Query("startEventDate"), c.Query("endEventDate"), c.Query("status"))
+func Post(c *gin.Context) {
+	var data models.Scheduler
+	c.BindJSON(&data)
+	cals, err := models.SchedulerPost(data)
 	if err != nil {
 		panic(err)
 	}
 	c.JSON(200, cals)
 }
 
-/*-------- Internal -----------*/
-func createDBConnecton() *sql.DB {
-	// Open the connection
-	db, err := sql.Open("postgres", os.Getenv("POSTGRES_URL"))
-
+func Put(c *gin.Context) {
+	var data models.Scheduler
+	c.BindJSON(&data)
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	intN, err := models.SchedulerPut(id, data)
 	if err != nil {
 		panic(err)
 	}
-
-	// check the connection
-	err = db.Ping()
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected!")
-	// return the connection
-	return db
-}
-
-func getByFilter(startEventDate string, endEventDate string, status string) ([]models.Calendar, error) {
-	sqlStatament := "select * from tbCalendar "
-	var sqlWhere string
-	if startEventDate != "" && endEventDate != "" {
-		if sqlWhere != "" {
-			sqlWhere += " and "
-		}
-		sqlWhere += "eventDate between ? and ? "
-	}
-	if status != "" {
-		if sqlWhere != "" {
-			sqlWhere += " and "
-		}
-		sqlWhere += "status = ?"
-	}
-	if sqlWhere != "" {
-		sqlStatament = sqlStatament + " where " + sqlWhere
-	}
-
-	db := createDBConnecton()
-
-	defer db.Close()
-
-	rows, err := db.Query(sqlStatament, startEventDate, endEventDate, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var cals []models.Calendar
-	for rows.Next() {
-		var cal models.Calendar
-		err := rows.Scan(&cal.Id, &cal.EventDate, &cal.Effective, &cal.Status, &cal.Notes)
-		if err != nil {
-			return nil, err
-		}
-		cals = append(cals, cal)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return cals, nil
-
+	c.JSON(200, gin.H{"id": intN})
 }

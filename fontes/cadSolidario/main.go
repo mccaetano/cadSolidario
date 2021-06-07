@@ -8,9 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
 	"github.com/mccaetano/cadSolidario/controller"
+	"github.com/mccaetano/cadSolidario/models"
 )
 
 func main() {
+
+	err := models.ConnectDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	port := os.Getenv("PORT")
 
@@ -22,9 +28,10 @@ func main() {
 	router.Use(gin.Logger())
 
 	api := router.Group("/api")
-	api.GET("/calendar", controller.HandleGETCalendar)
-	api.POST("/calendar", controller.HandlePOSTCalendar)
-	api.PUT("/calendar/{id}", controller.HandlePUTCalendar)
+	api.GET("/calendar", controller.GetByFilter)
+	api.GET("/calendar/{id}", controller.GetByFilter)
+	api.POST("/calendar", controller.Post)
+	api.PUT("/calendar/{id}", controller.Put)
 
 	router.Use(static.Serve("/", static.LocalFile("./static", true)))
 
