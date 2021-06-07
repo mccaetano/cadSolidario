@@ -29,9 +29,9 @@ func main() {
 
 	api := router.Group("/api")
 	api.GET("/calendar", controller.GetByFilter)
-	api.GET("/calendar/{id}", controller.GetByFilter)
+	api.GET("/calendar/:id", controller.GetByFilter)
 	api.POST("/calendar", controller.Post)
-	api.PUT("/calendar/{id}", controller.Put)
+	api.PUT("/calendar/:id", controller.Put)
 
 	router.Use(static.Serve("/", static.LocalFile("./static", true)))
 
