@@ -29,7 +29,7 @@ func main() {
 
 	api := router.Group("/api")
 	api.GET("/calendar", controller.GetByFilter)
-	api.GET("/calendar/:id", controller.GetByFilter)
+	api.GET("/calendar/:id", controller.GetById)
 	api.POST("/calendar", controller.Post)
 	api.PUT("/calendar/:id", controller.Put)
 

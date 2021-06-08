@@ -12,16 +12,19 @@ import (
 
 func GetByFilter(c *gin.Context) {
 	log.Println("Init: GetByFilter")
-	dateStart, err := time.Parse("2006-03-01", c.Query("startEventDate"))
+	dateStart, err := time.Parse("2006-01-02", c.Query("startEventDate"))
 	if err != nil {
-		dateStart, _ = time.Parse("2006-03-01", "1900-01-01")
+		log.Printf("Erro to convert startEventDate(%s) - %s\n", c.Query("startEventDate"), err.Error())
+		dateStart, _ = time.Parse("2006-01-02", "1900-01-01")
 	}
-	dateEnd, err := time.Parse("2006-03-01", c.Query("endEventDate"))
+	dateEnd, err := time.Parse("2006-01-02", c.Query("endEventDate"))
 	if err != nil {
-		dateEnd, _ = time.Parse("2006-03-01", "1900-01-01")
+		log.Printf("Erro to convert endEventDate(%s) - %s\n", c.Query("endEventDate"), err.Error())
+		dateEnd, _ = time.Parse("2006-01-02", "1900-01-01")
 	}
-	log.Println("Params: Post")
-	cals, err := models.SchedulerGetByFilter(dateStart, dateEnd, c.Query("status"))
+	status := c.Query("status")
+	log.Printf("Params: startEventDate: %s, endEventDate: %s, status: %s\n", dateStart, dateEnd, status)
+	cals, err := models.SchedulerGetByFilter(dateStart, dateEnd, status)
 	if err != nil {
 		log.Println("Error: ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -33,7 +36,8 @@ func GetByFilter(c *gin.Context) {
 
 func GetById(c *gin.Context) {
 	log.Println("Init: GetById")
-	id, _ := strconv.ParseInt(c.Query("status"), 10, 64)
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	log.Printf("Params: id: %d\n", id)
 	cals, err := models.SchedulerGetById(id)
 	if err != nil {
 		log.Println("Error: ", err)
@@ -47,21 +51,32 @@ func GetById(c *gin.Context) {
 func Post(c *gin.Context) {
 	log.Println("Init: Post")
 	var data models.Scheduler
-	c.BindJSON(&data)
-	cals, err := models.SchedulerPost(data)
+	err := c.BindJSON(&data)
+	if err != nil {
+		log.Println("Error: ", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Printf("Body In= %+v\n", data)
+	id, err := models.SchedulerPost(data)
 	if err != nil {
 		log.Println("Error: ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	log.Printf("Finish: Body Out= %+v\n", cals)
-	c.JSON(200, cals)
+	data.Id = id
+	log.Printf("Finish: Body Out= %+v\n", data)
+	c.Header("Content-type", "application/json")
+	c.JSON(200, data)
 }
 
 func Put(c *gin.Context) {
 	log.Println("Init: Put")
 	var data models.Scheduler
-	c.BindJSON(&data)
+	c.BindJSON(data)
+
+	log.Printf("Finish: Body In= %+v\n", data)
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	cal, err := models.SchedulerPut(id, data)
 	if err != nil {
