@@ -68,7 +68,7 @@ func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, stat
 	}
 	defer rows.Close()
 
-	var schedulers []Scheduler
+	var schedulers []Scheduler = []Scheduler{}
 	for rows.Next() {
 		var scheduler Scheduler
 		rows.Scan(&scheduler.Id, &scheduler.EventDate, &scheduler.EffectiveDate, &scheduler.Status, &scheduler.Notes)
