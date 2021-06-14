@@ -32,6 +32,9 @@ func (ct CustomTime) MarshalJSON() ([]byte, error) {
 
 // String returns the time in the custom format
 func (ct *CustomTime) String() string {
+	if ct.IsZero() {
+		return ""
+	}
 	t := time.Time(*ct)
 	return fmt.Sprintf("%q", t.Format(ctLayout))
 }
