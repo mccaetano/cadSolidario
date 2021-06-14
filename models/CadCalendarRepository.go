@@ -11,11 +11,11 @@ import (
 )
 
 type Scheduler struct {
-	Id            int64           `json: id`
-	EventDate     util.CustomTime `json: eventDate`
-	EffectiveDate util.CustomTime `json: effectiveDate`
-	Status        string          `json: status`
-	Notes         string          `json: notes`
+	Id            int64           `json:"id"`
+	EventDate     util.CustomTime `json:"eventDate,omitempty"`
+	EffectiveDate util.CustomTime `json:"effectiveDate,omitempty"`
+	Status        string          `json:"status,omitempty"`
+	Notes         string          `json:"notes,omitempty"`
 }
 
 var DB *sql.DB
