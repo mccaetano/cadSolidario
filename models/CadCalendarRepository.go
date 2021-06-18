@@ -60,7 +60,7 @@ func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, stat
 	rows, err := DB.Query(`select id, to_char(event_date, 'YYYY-MM-DD') as event_date, 
 		to_char(effective_date, 'YYYY-MM-DD') as effective_date, status, notes 
 		from public.tbcalendar where (event_date between $1 and $2 or '1900-01-01' = $1) and (status = $3 or '' = $3)
-		order by event_date desc limit $$ OFFSET $5`,
+		order by event_date desc limit $4 OFFSET $5`,
 		startEventDate.Format("2006-01-02"),
 		endEventDate.Format("2006-01-02"),
 		status,

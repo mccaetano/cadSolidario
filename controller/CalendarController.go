@@ -23,9 +23,17 @@ func GetByFilter(c *gin.Context) {
 		dateEnd, _ = time.Parse("2006-01-02", "1900-01-01")
 	}
 	status := c.Query("status")
-	limit, _ := strconv.ParseInt(c.Query("limit"), 5, 32)
-	skip, _ := strconv.ParseInt(c.Query("skip"), 5, 32)
+	limit, err := strconv.ParseInt(c.Query("limit"), 5, 32)
+	if err != nil {
+		log.Printf("Erro to convert limit(%s) - %s\n", c.Query("limit"), err.Error())
+		limit = 0
+	}
 
+	skip, err := strconv.ParseInt(c.Query("skip"), 5, 32)
+	if err != nil {
+		log.Printf("Erro to convert skip(%s) - %s\n", c.Query("skip"), err.Error())
+		skip = 20
+	}
 	log.Printf("Params: startEventDate: %s, endEventDate: %s, status: %s\n", dateStart, dateEnd, status)
 	cals, err := models.SchedulerGetByFilter(dateStart, dateEnd, status, int32(limit), int32(skip))
 	if err != nil {
