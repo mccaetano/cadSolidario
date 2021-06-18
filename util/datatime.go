@@ -12,7 +12,13 @@ const ctLayout = "2006-01-02"
 
 // UnmarshalJSON Parses the json string in the custom format
 func (ct *CustomTime) UnmarshalJSON(b []byte) (err error) {
+	if b == nil {
+		return
+	}
 	s := strings.Trim(string(b), `"`)
+	if s == "" {
+		return
+	}
 	nt, err := time.Parse(ctLayout, s)
 	if err == nil {
 		*ct = CustomTime(nt)
@@ -27,6 +33,9 @@ func (ct *CustomTime) UnmarshalJSON(b []byte) (err error) {
 
 // MarshalJSON writes a quoted string in the custom format
 func (ct CustomTime) MarshalJSON() ([]byte, error) {
+	if ct.IsZero() {
+		return nil, nil
+	}
 	return []byte(ct.String()), nil
 }
 
