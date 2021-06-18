@@ -7,15 +7,14 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/mccaetano/cadSolidario/util"
 )
 
 type Scheduler struct {
-	Id            int64           `json:"id"`
-	EventDate     util.CustomTime `json:"eventDate,omitempty"`
-	EffectiveDate util.CustomTime `json:"effectiveDate,omitempty"`
-	Status        string          `json:"status,omitempty"`
-	Notes         string          `json:"notes,omitempty"`
+	Id            int64  `json:"id"`
+	EventDate     string `json:"eventDate,omitempty"`
+	EffectiveDate string `json:"effectiveDate,omitempty"`
+	Status        string `json:"status,omitempty"`
+	Notes         string `json:"notes,omitempty"`
 }
 
 var DB *sql.DB
@@ -48,20 +47,25 @@ func ConnectDatabase() error {
 
 func SchedulerGetById(id int64) (Scheduler, error) {
 
-	row := DB.QueryRow("select id, event_date, effective_date, status, notes from public.tbcalendar where id = $1", id)
+	row := DB.QueryRow(`select id, to_char(event_date, 'YYYY-MM-DD') as event_date, 
+	to_char(effective_date, 'YYYY-MM-DD') as effective_date, status, notes from public.tbcalendar where id = $1`, id)
 	var scheduler Scheduler
 	row.Scan(&scheduler.Id, &scheduler.EventDate, &scheduler.EffectiveDate, &scheduler.Status, &scheduler.Notes)
 
 	return scheduler, nil
 }
 
-func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, status string) ([]Scheduler, error) {
+func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, status string, limit int32, skip int32) ([]Scheduler, error) {
 
-	rows, err := DB.Query(`select id, event_date, effective_date, status, notes 
-		from public.tbcalendar where (event_date between $1 and $2 or '1900-01-01' = $1) and (status = $3 or '' = $3)`,
+	rows, err := DB.Query(`select id, to_char(event_date, 'YYYY-MM-DD') as event_date, 
+		to_char(effective_date, 'YYYY-MM-DD') as effective_date, status, notes 
+		from public.tbcalendar where (event_date between $1 and $2 or '1900-01-01' = $1) and (status = $3 or '' = $3)
+		order by event_date desc limit $$ OFFSET $5`,
 		startEventDate.Format("2006-01-02"),
 		endEventDate.Format("2006-01-02"),
-		status)
+		status,
+		limit,
+		skip)
 	if err != nil {
 		log.Println("Erro lendo datados:", err)
 		return nil, err
@@ -80,10 +84,25 @@ func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, stat
 
 func SchedulerPost(scheduler Scheduler) (int64, error) {
 	var id int64
+	var eventDate string = "1900-01-01"
+	if scheduler.EventDate != "" {
+		date, err := time.Parse("2006-01-02", scheduler.EventDate)
+		if err != nil {
+			eventDate = date.Format("2006-01-02")
+		}
+	}
+	var effectiveDate string = "1900-01-01"
+	if scheduler.EffectiveDate != "" {
+		date, err := time.Parse("2006-01-02", scheduler.EffectiveDate)
+		if err != nil {
+			effectiveDate = date.Format("2006-01-02")
+		}
+	}
+
 	DB.QueryRow(`insert into public.tbcalendar ( event_date, effective_date, status, notes) 
 		values ($1, $2, $3, $4)  RETURNING id`,
-		scheduler.EventDate,
-		scheduler.EffectiveDate,
+		eventDate,
+		effectiveDate,
 		scheduler.Status,
 		scheduler.Notes).Scan(&id)
 
