@@ -26,15 +26,15 @@ func GetByFilter(c *gin.Context) {
 	limit, err := strconv.ParseInt(c.Query("limit"), 5, 32)
 	if err != nil {
 		log.Printf("Erro to convert limit(%s) - %s\n", c.Query("limit"), err.Error())
-		limit = 0
+		limit = 20
 	}
 
 	skip, err := strconv.ParseInt(c.Query("skip"), 5, 32)
 	if err != nil {
 		log.Printf("Erro to convert skip(%s) - %s\n", c.Query("skip"), err.Error())
-		skip = 20
+		skip = 0
 	}
-	log.Printf("Params: startEventDate: %s, endEventDate: %s, status: %s\n", dateStart, dateEnd, status)
+	log.Printf("Params: startEventDate: %s, endEventDate: %s, status: %s, Limit:%d, skip:%d\n", dateStart, dateEnd, status, limit, skip)
 	cals, err := models.SchedulerGetByFilter(dateStart, dateEnd, status, int32(limit), int32(skip))
 	if err != nil {
 		log.Println("Error: ", err)
