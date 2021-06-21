@@ -28,6 +28,7 @@ func main() {
 	router.Use(gin.Logger())
 
 	api := router.Group("/api")
+	api.GET("/calendar/status", controller.GetByStatus)
 	api.GET("/calendar", controller.GetByFilter)
 	api.GET("/calendar/:id", controller.GetById)
 	api.POST("/calendar", controller.Post)

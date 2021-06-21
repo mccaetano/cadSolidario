@@ -9,11 +9,16 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type Status struct {
+	Code        string `json:"code"`
+	Description string `json:"description,omitempty"`
+}
+
 type Scheduler struct {
 	Id            int64  `json:"id"`
 	EventDate     string `json:"eventDate,omitempty"`
 	EffectiveDate string `json:"effectiveDate,omitempty"`
-	Status        string `json:"status,omitempty"`
+	Sta           Status `json:"status,omitempty"`
 	Notes         string `json:"notes,omitempty"`
 }
 
@@ -47,20 +52,48 @@ func ConnectDatabase() error {
 
 func SchedulerGetById(id int64) (Scheduler, error) {
 
-	row := DB.QueryRow(`select id, to_char(event_date, 'YYYY-MM-DD') as event_date, 
-	to_char(effective_date, 'YYYY-MM-DD') as effective_date, status, notes from public.tbcalendar where id = $1`, id)
+	row := DB.QueryRow(`select
+				c.id,
+				to_char(c.event_date, 'YYYY-MM-DD') as event_date,
+				to_char(c.effective_date, 'YYYY-MM-DD') as effective_date,
+				c.status,
+				s.description as status_description,
+				c.notes
+			from
+				public.tbcalendar c
+				inner join public.tbstatus s on
+					s.code = c.status 
+			where
+				c.id = $1`, id)
 	var scheduler Scheduler
-	row.Scan(&scheduler.Id, &scheduler.EventDate, &scheduler.EffectiveDate, &scheduler.Status, &scheduler.Notes)
+	row.Scan(&scheduler.Id, &scheduler.EventDate, &scheduler.EffectiveDate, &scheduler.Sta.Code,
+		&scheduler.Sta.Description, &scheduler.Notes)
 
 	return scheduler, nil
 }
 
 func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, status string, limit int32, skip int32) ([]Scheduler, error) {
 	offset := limit * (skip - 1)
-	rows, err := DB.Query(`select id, to_char(event_date, 'YYYY-MM-DD') as event_date, 
-		to_char(effective_date, 'YYYY-MM-DD') as effective_date, status, notes 
-		from public.tbcalendar where (event_date between $1 and $2 or '1900-01-01' = $1) and (status = $3 or '' = $3)
-		order by event_date desc, id desc limit $4 OFFSET $5`,
+	rows, err := DB.Query(`select
+				c.id,
+				to_char(c.event_date, 'YYYY-MM-DD') as event_date,
+				to_char(c.effective_date, 'YYYY-MM-DD') as effective_date,
+				c.status,
+				s.description as status_description,
+				c.notes
+			from
+				public.tbcalendar c
+				inner join public.tbstatus s on
+					s.code = c.status
+			where
+				(c.event_date between $1 and $2
+					or '1900-01-01' = $1)
+				and (c.status = $3
+					or '' = $3)
+			order by
+				c.event_date desc,
+				c.id desc
+			limit $4 offset $5`,
 		startEventDate.Format("2006-01-02"),
 		endEventDate.Format("2006-01-02"),
 		status,
@@ -75,7 +108,8 @@ func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, stat
 	var schedulers []Scheduler = []Scheduler{}
 	for rows.Next() {
 		var scheduler Scheduler
-		rows.Scan(&scheduler.Id, &scheduler.EventDate, &scheduler.EffectiveDate, &scheduler.Status, &scheduler.Notes)
+		rows.Scan(&scheduler.Id, &scheduler.EventDate, &scheduler.EffectiveDate, &scheduler.Sta.Code,
+			&scheduler.Sta.Description, &scheduler.Notes)
 		if string(scheduler.EffectiveDate) == "0001-01-01" || scheduler.EffectiveDate == "1900-01-01" {
 			scheduler.EffectiveDate = ""
 		}
@@ -86,6 +120,28 @@ func SchedulerGetByFilter(startEventDate time.Time, endEventDate time.Time, stat
 	}
 
 	return schedulers, nil
+}
+
+func SchedulerGetStatus() ([]Status, error) {
+	rows, err := DB.Query(`select
+			s.code ,
+			s.description 
+		from
+			public.tbstatus s`)
+	if err != nil {
+		log.Println("Erro lendo datados:", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sstatuss []Status = []Status{}
+	for rows.Next() {
+		var status Status
+		rows.Scan(&status.Code, &status.Description)
+		sstatuss = append(sstatuss, status)
+	}
+
+	return sstatuss, nil
 }
 
 func SchedulerPost(scheduler Scheduler) (int64, error) {
@@ -109,7 +165,7 @@ func SchedulerPost(scheduler Scheduler) (int64, error) {
 		values ($1, $2, $3, $4)  RETURNING id`,
 		eventDate,
 		effectiveDate,
-		scheduler.Status,
+		scheduler.Sta.Code,
 		scheduler.Notes).Scan(&id)
 
 	return id, nil
@@ -122,7 +178,7 @@ func SchedulerPut(id int64, scheduler Scheduler) (Scheduler, error) {
 		id,
 		scheduler.EventDate,
 		scheduler.EffectiveDate,
-		scheduler.Status,
+		scheduler.Sta.Code,
 		&scheduler.Notes)
 	if err != nil {
 		log.Println("Erro lendo datados:", err)

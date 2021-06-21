@@ -10,6 +10,18 @@ import (
 	"github.com/mccaetano/cadSolidario/models"
 )
 
+func GetByStatus(c *gin.Context) {
+	log.Println("Init: GetByStatus")
+	cals, err := models.SchedulerGetStatus()
+	if err != nil {
+		log.Println("Error: ", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	log.Printf("Finish: Body Out= %+v\n", cals)
+	c.JSON(200, cals)
+}
+
 func GetByFilter(c *gin.Context) {
 	log.Println("Init: GetByFilter")
 	dateStart, err := time.Parse("2006-01-02", c.Query("startEventDate"))
