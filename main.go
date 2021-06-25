@@ -28,12 +28,22 @@ func main() {
 	router.Use(gin.Logger())
 
 	api := router.Group("/api")
-	api.GET("/calendar/status", controller.GetByStatus)
-	api.GET("/calendar", controller.GetByFilter)
-	api.GET("/calendar/:id", controller.GetById)
-	api.POST("/calendar", controller.Post)
-	api.PUT("/calendar/:id", controller.Put)
+	api.GET("/calendar", controller.GetCalendarByFilter)
+	api.GET("/calendar/event-dates", controller.GetCalendarEventDate)
+	api.POST("/calendar", controller.PostCalendar)
+	api.PUT("/calendar/:id", controller.PutCalendar)
 
+	api.GET("/status", controller.GetStatusByFilter)
+	api.GET("/status/:id", controller.GetStatuById)
+	api.POST("/status/", controller.PostPost)
+	api.PUT("/status/", controller.PutStatus)
+
+	api.GET("/recipient", controller.GetRecipientByFilter)
+	api.GET("/recipient/:id", controller.GetRecipientById)
+	api.POST("/recipient", controller.PostCalendar)
+	api.PUT("/recipient/:id", controller.PutCalendar)
+
+	api.GET("/address/:postalCode", controller.GetStatusByFilter)
 	router.Use(static.Serve("/", static.LocalFile("./static", true)))
 
 	router.Run(":" + port)

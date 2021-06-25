@@ -10,103 +10,94 @@ import (
 	"github.com/mccaetano/cadSolidario/models"
 )
 
-func GetByStatus(c *gin.Context) {
-	log.Println("Init: GetByStatus")
-	cals, err := models.SchedulerGetStatus()
-	if err != nil {
-		log.Println("Error: ", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	log.Printf("Finish: Body Out= %+v\n", cals)
-	c.JSON(200, cals)
+type PostCalendarRequest struct {
+	EventDate string `json:"eventDate"`
+}
+type PutCalendarRequest struct {
+	Status models.Status `json:"status"`
 }
 
-func GetByFilter(c *gin.Context) {
-	log.Println("Init: GetByFilter")
-	dateStart, err := time.Parse("2006-01-02", c.Query("startEventDate"))
+func GetCalendarByFilter(c *gin.Context) {
+	eventDate, err := time.Parse("2006-01-02", c.Query("eventDate"))
 	if err != nil {
-		log.Printf("Erro to convert startEventDate(%s) - %s\n", c.Query("startEventDate"), err.Error())
-		dateStart, _ = time.Parse("2006-01-02", "1900-01-01")
+		log.Printf("Controller: (calendar) GetByFilter - Erro to convert eventDate(%s) - %s\n", c.Query("eventDate"), err.Error())
+		eventDate, _ = time.Parse("2006-01-02", "1900-01-01")
 	}
-	dateEnd, err := time.Parse("2006-01-02", c.Query("endEventDate"))
-	if err != nil {
-		log.Printf("Erro to convert endEventDate(%s) - %s\n", c.Query("endEventDate"), err.Error())
-		dateEnd, _ = time.Parse("2006-01-02", "1900-01-01")
-	}
-	status := c.Query("status")
+	name := c.Query("name")
 	limit, err := strconv.ParseInt(c.Query("limit"), 5, 32)
 	if err != nil {
-		log.Printf("Erro to convert limit(%s) - %s\n", c.Query("limit"), err.Error())
+		log.Printf("Controller: (calendar) GetByFilter - Erro to convert limit(%s) - %s\n", c.Query("limit"), err.Error())
 		limit = 20
 	}
-
 	skip, err := strconv.ParseInt(c.Query("skip"), 5, 32)
 	if err != nil {
-		log.Printf("Erro to convert skip(%s) - %s\n", c.Query("skip"), err.Error())
+		log.Printf("Controller: (calendar) GetByFilter - Erro to convert skip(%s) - %s\n", c.Query("skip"), err.Error())
 		skip = 0
 	}
-	log.Printf("Params: startEventDate: %s, endEventDate: %s, status: %s, Limit:%d, skip:%d\n", dateStart, dateEnd, status, limit, skip)
-	cals, err := models.SchedulerGetByFilter(dateStart, dateEnd, status, int32(limit), int32(skip))
+	log.Printf("Controller: (calendar) GetByFilter - Params: eventDate: %s, name: %s, Limit:%d, skip:%d\n", eventDate, name, limit, skip)
+	cals, err := models.CalendarGetByFilter(eventDate, name, int32(limit), int32(skip))
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Println("Controller: (calendar) GetByFilter - Error: ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	log.Printf("Finish: Body Out= %+v\n", cals)
+	log.Printf("Controller: (calendar) GetByFilter - Finish: Body Out= %+v\n", cals)
 	c.JSON(200, cals)
 }
 
-func GetById(c *gin.Context) {
-	log.Println("Init: GetById")
-	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	log.Printf("Params: id: %d\n", id)
-	cals, err := models.SchedulerGetById(id)
+func GetCalendarEventDate(c *gin.Context) {
+	log.Printf("Controller: (calendar) GetCalendarEventDate - \n")
+	cals, err := models.CalendarGetEventDates()
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Println("Controller: (calendar) GetCalendarEventDate - Error: ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	log.Printf("Finish: Body Out= %+v\n", cals)
+	log.Printf("Controller: (calendar) GetCalendarEventDate - Finish: Body Out= %+v\n", cals)
 	c.JSON(200, cals)
 }
 
-func Post(c *gin.Context) {
-	log.Println("Init: Post")
-	var data models.Scheduler
+func PostCalendar(c *gin.Context) {
+	log.Println("Controller: (calendar) - Post")
+	var data PostCalendarRequest
 	err := c.BindJSON(&data)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Println("Controller: (calendar) - Post: Error=", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	log.Printf("Controller: (calendar) - Post: Body In= %+v\n", data)
 
-	log.Printf("Body In= %+v\n", data)
-	id, err := models.SchedulerPost(data)
+	eventDate, err := time.Parse("2006-01-02", data.EventDate)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Printf("Controller: (calendar) Post - Erro to convert eventDate(%s) - %s\n", data.EventDate, err.Error())
+		eventDate, _ = time.Parse("2006-01-02", "1900-01-01")
+	}
+	err = models.CalendarPost(eventDate)
+	if err != nil {
+		log.Println("Controller: (calendar) - Post: Error=", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	data.Id = id
-	log.Printf("Finish: Body Out= %+v\n", data)
+
+	log.Printf("Controller: (calendar) - Post: Body Out= \n")
 	c.Header("Content-type", "application/json")
-	c.JSON(200, data)
+	c.JSON(201, gin.H{})
 }
 
-func Put(c *gin.Context) {
-	log.Println("Init: Put")
-	var data models.Scheduler
+func PutCalendar(c *gin.Context) {
+	log.Println("Controller: (calendar) - Put: Init")
+	var data PutCalendarRequest
 	c.BindJSON(data)
 
-	log.Printf("Finish: Body In= %+v\n", data)
+	log.Printf("Controller: (calendar) - Post: Body In= %+v\n", data)
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	cal, err := models.SchedulerPut(id, data)
+	err := models.CalendarPut(id, data.Status.Id)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Println("Controller: (calendar) - Post: Error=", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	log.Printf("Finish: Body Out= %+v\n", cal)
-	c.JSON(200, cal)
+	log.Printf("Controller: (calendar) - Post: Body Out= \n")
+	c.JSON(201, gin.H{})
 }
