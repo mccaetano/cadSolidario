@@ -94,8 +94,8 @@ func CalendarPost(eventDate time.Time) error {
 			select
 				$1 as "event_date",
 				case
-					when a.status is null then 7
-					else a.status
+					when a.status = 8 then 8
+					else 7
 				end status,
 				b.id beneficiario
 			from
