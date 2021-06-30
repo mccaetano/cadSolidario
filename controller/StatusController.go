@@ -14,16 +14,16 @@ func GetStatusByFilter(c *gin.Context) {
 	description := c.Query("description")
 	limit, err := strconv.ParseInt(c.Query("limit"), 5, 32)
 	if err != nil {
-		log.Printf("Controller: (status) GetByFilter - Erro to convert limit(%s) - %s\n", c.Query("limit"), err.Error())
+		log.Printf("Controller: (status) GetByFilter - Params: limit is missing\n")
 		limit = 20
 	}
 
 	skip, err := strconv.ParseInt(c.Query("skip"), 5, 32)
 	if err != nil {
-		log.Printf("Controller: (status) GetByFilter - Erro to convert skip(%s) - %s\n", c.Query("skip"), err.Error())
-		skip = 0
+		log.Printf("Controller: (status) GetByFilter - Params: skip missing\n")
+		skip = 1
 	}
-	log.Printf("Controller: (status) GetByFilter - Params= description:%s, Limit:%d, skip:%d\n", description, limit, skip)
+	log.Printf("Controller: (status) GetByFilter - Params: description:%s, Limit:%d, skip:%d\n", description, limit, skip)
 	cals, err := models.StatusGetByFilter(description, int32(limit), int32(skip))
 	if err != nil {
 		log.Println("Controller: (status) GetByFilter - Error: ", err)

@@ -8,12 +8,12 @@ import (
 )
 
 type Calendar struct {
-	Id        int64    `json:"id,omitempty"`
+	Id        int      `json:"id,omitempty"`
 	EventDate string   `json:"eventDate,omitempty"`
 	Name      string   `json:"name,omitempty"`
 	Documents Document `json:"documents,omitempty"`
 	Contacts  Contact  `json:"contacts,omitempty"`
-	Milks     int64    `json:"milks,omitempty"`
+	Milks     int      `json:"milks,omitempty"`
 	Status    Status   `json:"status,omitempty"`
 }
 
@@ -120,9 +120,9 @@ func CalendarPost(eventDate time.Time) error {
 	return nil
 }
 
-func CalendarPut(id int64, status int64) error {
+func CalendarPut(id int, status int) error {
 	log.Printf("Repo: (Calendar) Put - id: %d, status: %d\n", id, status)
-	_, err := DB.Exec(`update public.tbcalendar set status = $2 where id = $1`,
+	_, err := DB.Exec(`update tbagendamento set status = $2 where id = $1`,
 		id,
 		status)
 	if err != nil {

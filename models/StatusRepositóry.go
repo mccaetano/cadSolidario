@@ -5,7 +5,7 @@ import (
 )
 
 type Status struct {
-	Id          int64  `json:"id,omitempty"`
+	Id          int    `json:"id,omitempty"`
 	Description string `json:"description,omitempty"`
 }
 
@@ -34,7 +34,8 @@ func StatusGetByFilter(description string, limit int32, skip int32) ([]Status, e
 			from
 				tbstatus t 
 			where 
-				t.descricao like '%' || $1 || '%'`,
+				t.descricao like '%' || $1 || '%'
+			limit $2 offset $3`,
 		description,
 		limit,
 		offset)
@@ -54,10 +55,10 @@ func StatusGetByFilter(description string, limit int32, skip int32) ([]Status, e
 	return statuss, nil
 }
 
-func StatusPost(status Status) (int64, error) {
+func StatusPost(status Status) (int, error) {
 	log.Printf("Repo: (Status) Post - body: %+v\n", status)
 
-	var id int64
+	var id int
 	DB.QueryRow(`INSERT INTO public.tbstatus
 			(descricao)
 			VALUES($1)

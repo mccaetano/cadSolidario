@@ -35,8 +35,8 @@ func main() {
 
 	api.GET("/status", controller.GetStatusByFilter)
 	api.GET("/status/:id", controller.GetStatuById)
-	api.POST("/status/", controller.PostPost)
-	api.PUT("/status/", controller.PutStatus)
+	api.POST("/status", controller.PostPost)
+	api.PUT("/status", controller.PutStatus)
 
 	api.GET("/recipient", controller.GetRecipientByFilter)
 	api.GET("/recipient/:id", controller.GetRecipientById)

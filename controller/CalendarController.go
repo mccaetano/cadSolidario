@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -68,7 +69,7 @@ func PostCalendar(c *gin.Context) {
 	}
 	log.Printf("Controller: (calendar) - Post: Body In= %+v\n", data)
 
-	eventDate, err := time.Parse("2006-01-02", data.EventDate)
+	eventDate, err := time.Parse("2006-01-02", fmt.Sprintf("%.10s", data.EventDate))
 	if err != nil {
 		log.Printf("Controller: (calendar) Post - Erro to convert eventDate(%s) - %s\n", data.EventDate, err.Error())
 		eventDate, _ = time.Parse("2006-01-02", "1900-01-01")
@@ -88,16 +89,16 @@ func PostCalendar(c *gin.Context) {
 func PutCalendar(c *gin.Context) {
 	log.Println("Controller: (calendar) - Put: Init")
 	var data PutCalendarRequest
-	c.BindJSON(data)
+	c.BindJSON(&data)
 
-	log.Printf("Controller: (calendar) - Post: Body In= %+v\n", data)
+	log.Printf("Controller: (calendar) - Put: Body In= %+v\n", data)
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	err := models.CalendarPut(id, data.Status.Id)
+	err := models.CalendarPut(int(id), data.Status.Id)
 	if err != nil {
-		log.Println("Controller: (calendar) - Post: Error=", err)
+		log.Println("Controller: (calendar) - Put: Error=", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	log.Printf("Controller: (calendar) - Post: Body Out= \n")
+	log.Printf("Controller: (calendar) - Put: Body Out= \n")
 	c.JSON(201, gin.H{})
 }
