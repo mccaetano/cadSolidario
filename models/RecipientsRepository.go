@@ -24,7 +24,7 @@ type Dependent struct {
 type Recipient struct {
 	Id          int64       `json:"id,omitempty"`
 	Name        string      `json:"name,omitempty"`
-	Birthdate   string      `json:"birthdate,omitempty"`
+	Birthdate   string      `json:"birthDate,omitempty"`
 	Address     string      `json:"address,omitempty"`
 	Work        string      `json:"work,omitempty"`
 	Documents   Document    `json:"documents,omitempty"`
@@ -47,7 +47,7 @@ func RecipientGetById(id int64) (Recipient, error) {
 	row := DB.QueryRow(`select
 			id,
 			nome,
-			data_nacimento,
+			to_char(data_nacimento, 'YYYY-MM-DD') data_nacimento,
 			profissao,
 			documento_rg,
 			documento_cpf,
@@ -101,7 +101,7 @@ func RecipientGetByFilter(name string, limit int32, skip int32) ([]Recipient, er
 	rows, err := DB.Query(`select
 				id,
 				nome,
-				data_nacimento,
+				to_char(data_nacimento, 'YYYY-MI-DD') data_nascimento,
 				profissao,
 				documento_rg,
 				documento_cpf,
