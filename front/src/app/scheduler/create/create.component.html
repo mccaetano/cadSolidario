@@ -1,0 +1,40 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">Modal</h4>
+  <button
+    type="button"
+    class="close pull-right"
+    aria-label="Close"
+    (click)="close()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <div class="col">
+      <div class="submit-form bg-light p-5 rounded">
+        <div class="form-group">
+          <label for="eventDate">Data do Entrega:</label>
+          <div class="input-group mb-3">
+            <input
+              id="eventDate"
+              type="text"
+              placeholder="EventDate"
+              class="form-control"
+              bsDatepicker
+              [(ngModel)]="scheduler.eventDate"
+              aria-describedby="basic-addon2"
+            />
+            <span class="input-group-text" id="basic-addon2">
+              <i i-bs name="calendar-date"></i>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button class="btn btn-primary" (click)="create()">criar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

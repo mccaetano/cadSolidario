@@ -1,0 +1,295 @@
+<div class="row">
+  <div class="col">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/scheduler">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Beneficiário</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="row">
+      <div class="col">
+        <div class="submit-form bg-light p-5 rounded">
+          <div class="form-group">
+            <label for="nameSearch">Nome:</label>
+            <input
+              id="nameSearch"
+              type="text"
+              class="form-control"
+              [(ngModel)]="nameSearch"
+            />
+          </div>
+          <button class="btn btn-primary" (click)="getByFilter()">
+            Buscar
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <ul class="reciplist">
+          <li
+            *ngFor="let recipient of recipients"
+            [class.selected]="recipient.id === selRecipientId"
+            (click)="getById(recipient.id ?? 0)"
+          >
+            {{ recipient.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="row">
+      <div class="col">
+        <h2>Beneficiário</h2>
+      </div>
+      <div class="col">
+        <button class="btn btn-primary" (click)="create()">Adicionar</button>
+      </div>
+    </div>
+    <form [formGroup]="form">
+      <div class="form-group">
+        <label for="id">Id:</label>
+        <input
+          formControlName="id"
+          id="id"
+          type="text"
+          required
+          class="form-control"
+          readonly
+        />
+      </div>
+      <div class="form-group">
+        <label for="name">None:</label>
+        <input
+          formControlName="name"
+          id="name"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="birthDate">Data de Nascimento:</label>
+        <input
+          formControlName="birthDate"
+          id="birthDate"
+          type="text"
+          bsDatepicker
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="work">Profissão:</label>
+        <input
+          formControlName="work"
+          id="work"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone">Telefone:</label>
+        <input
+          formControlName="phone"
+          id="phone"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="celPhone">Celular:</label>
+        <input
+          formControlName="celPhone"
+          id="celPhone"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="address">Endereço:</label>
+        <input
+          formControlName="address"
+          id="address"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="documentRg">RG:</label>
+        <input
+          formControlName="documentRg"
+          id="documentRg"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="documentCpf">CPF:</label>
+        <input
+          formControlName="documentCpf"
+          id="documentCpf"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="documentCpts">CPTS:</label>
+        <input
+          formControlName="documentCpts"
+          id="documentCpts"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="documentPis">PIS:</label>
+        <input
+          formControlName="documentPis"
+          id="documentPis"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="dependents0Name">Dependente Nome:</label>
+        <input
+          formControlName="dependents0Name"
+          id="dependents0Name"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="dependents0Doc">Dependente Documento:</label>
+        <input
+          formControlName="dependents0Doc"
+          id="dependents0Doc"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="dependents1Name">Dependente 1:</label>
+        <input
+          formControlName="dependents1Name"
+          id="dependents1Name"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="dependents2Name">Dependente 2:</label>
+        <input
+          formControlName="dependents2Name"
+          id="dependents2Name"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-check">
+        <label for="retiree" class="form-check-label">Aposentado</label>
+        <input
+          formControlName="retiree"
+          id="retiree"
+          type="checkbox"
+          class="form-check-input"
+        />
+      </div>
+      <div class="form-check">
+        <label for="rentPay" class="form-check-label">Paga Aluguel</label>
+        <input
+          formControlName="rentPay"
+          id="rentPay"
+          type="checkbox"
+          class="form-check-input"
+        />
+      </div>
+      <div class="form-group">
+        <label for="working">Qtde Pessoal na Casa:</label>
+        <input
+          formControlName="working"
+          id="working"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="homePeaples">Qtde Pessoal trabalham:</label>
+        <input
+          formControlName="homePeaples"
+          id="homePeaples"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="milks">Qtde Leites:</label>
+        <input
+          formControlName="milks"
+          id="milks"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="babys">Qtde Bebês:</label>
+        <input
+          formControlName="babys"
+          id="babys"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="boys">Qtde Meninos:</label>
+        <input
+          formControlName="boys"
+          id="boys"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="girls">Qtde Meninas:</label>
+        <input
+          formControlName="girls"
+          id="girls"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="helpFamily">Bolsa Familia:</label>
+        <input
+          formControlName="helpFamily"
+          id="helpFamily"
+          type="text"
+          class="form-control"
+        />
+      </div>
+      <div class="form-check">
+        <label for="active" class="form-check-label">Ativo</label>
+        <input
+          formControlName="active"
+          id="active"
+          type="checkbox"
+          class="form-check-input"
+        />
+      </div>
+      <div class="form-group">
+        <button class="btn btn-success" (click)="openModal(template)">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+<ng-template #template>
+  <div class="modal-body text-center">
+    <p>Confirma Alterações?</p>
+    <button type="button" class="btn btn-default" (click)="confirm()" >Sim</button>
+    <button type="button" class="btn btn-primary" (click)="decline()" >Não</button>
+  </div>
+</ng-template>

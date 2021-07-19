@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">Modal</h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <div class="col">
+      <div class="submit-form bg-light p-5 rounded">
+        <div class="form-group">
+          <label for="status">Status:</label>
+          <select id="status" class="form-control" [(ngModel)]="statusCurrent">
+            <option disabled>Status</option>
+           <option *ngFor="let status of statusList" value="{{status.id}}">{{status.description}}</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" (click)="setStatus()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>

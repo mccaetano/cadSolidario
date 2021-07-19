@@ -1,0 +1,69 @@
+<div class="row">
+  <div class="col">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item active" aria-current="page">Home</li>
+      </ol>
+    </nav>
+  </div>
+  <div class="col float-right">
+    <button  class="btn btn-primary" (click)="openModalCreate()">Adicionar Agenda</button>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="submit-form bg-light p-5 rounded">
+      <div class="form-group">
+        <label for="status">Evento:</label>
+        <select id="status" class="form-select" [(ngModel)]="eventDateSearch">
+          <option disabled>Evento</option>
+         <option *ngFor="let event of eventDates">{{event.eventDate}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="nomeSearch">Nome:</label>
+        <input id="nomeSearch" type="text"
+          class="form-control" [(ngModel)]="nameSearch">
+      </div>
+      <button class="btn btn-primary" (click)="getByFilter()">Buscar</button>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">CPF</th>
+          <th scope="col">Telefone</th>
+          <th scope="col">Celular</th>
+          <th scope="col">Qtde.Leite</th>
+          <th scope="col">Status</th>
+          <th scope="col" width="220px">#</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let scheduler of schedulers">
+          <td>{{ scheduler.name }}</td>
+          <td>{{ scheduler.documents?.cpf }}</td>
+          <td>{{ scheduler.contacts?.phone }}</td>
+          <td>{{ scheduler.contacts?.celPhone }}</td>
+          <td>{{ scheduler.milks }}</td>
+          <td>{{ scheduler.status?.description }}</td>
+          <td>
+            <button  class="btn btn-primary" (click)="openModalUpdate(scheduler.id)">Status</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#" [routerLink]="['/scheduler']" (click)="changePage('m')">Anterior</a></li>
+        <li class="page-item  active"  aria-current="page"><a class="page-link" href="#" [routerLink]="['/scheduler']" (click)="changePage('n')">{{currentPage}}</a></li>
+        <li class="page-item"><a class="page-link" href="#" [routerLink]="['/scheduler']" (click)="changePage('p')">{{currentPage + 1}}</a></li>
+        <li class="page-item"><a class="page-link" href="#" [routerLink]="['/scheduler']" (click)="changePage('p')">Próximo</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>

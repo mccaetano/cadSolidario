@@ -1,0 +1,7 @@
+{
+   "/api/*": {
+        "target": "https://fathomless-oasis-19706.herokuapp.com",
+        "secure": true,
+        "logLevel": "debug"
+    }
+}
