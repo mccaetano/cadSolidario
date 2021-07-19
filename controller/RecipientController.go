@@ -51,3 +51,43 @@ func GetRecipientById(c *gin.Context) {
 	log.Printf("Controller: (Recipient) GetRecipientById - Finish: Body Out= %+v\n", cals)
 	c.JSON(200, cals)
 }
+
+func PostRecipient(c *gin.Context) {
+	log.Println("Controller: (recipient) - Post")
+	var data models.Recipient
+	err := c.BindJSON(&data)
+	if err != nil {
+		log.Println("Controller: (recipient) - Post: Error=", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	log.Printf("Controller: (recipient) - Post: Body In= %+v\n", data)
+
+	_, err = models.RecipientPost(data)
+	if err != nil {
+		log.Println("Controller: (recipient) - Post: Error=", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Printf("Controller: (recipient) - Post: Body Out= \n")
+	c.Header("Content-type", "application/json")
+	c.JSON(201, gin.H{})
+}
+
+func PutRecipient(c *gin.Context) {
+	log.Println("Controller: (recipient) - Put: Init")
+	var data models.Recipient
+	c.BindJSON(&data)
+
+	log.Printf("Controller: (recipient) - Put: Body In= %+v\n", data)
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	_, err := models.RecipientPut(id, data)
+	if err != nil {
+		log.Println("Controller: (recipient) - Put: Error=", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	log.Printf("Controller: (recipient) - Put: Body Out= \n")
+	c.JSON(201, gin.H{})
+}

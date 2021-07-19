@@ -40,11 +40,11 @@ func main() {
 
 	api.GET("/recipient", controller.GetRecipientByFilter)
 	api.GET("/recipient/:id", controller.GetRecipientById)
-	api.POST("/recipient", controller.PostCalendar)
-	api.PUT("/recipient/:id", controller.PutCalendar)
+	api.POST("/recipient", controller.PostRecipient)
+	api.PUT("/recipient/:id", controller.PutRecipient)
 
 	api.GET("/address/:postalCode", controller.GetStatusByFilter)
-	router.Use(static.Serve("/", static.LocalFile("./static", true)))
+	router.Use(static.Serve("/", static.LocalFile("./front/dist/cadSolidario", true)))
 
 	router.Run(":" + port)
 }
