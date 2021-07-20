@@ -201,10 +201,10 @@ func RecipientPost(recipient Recipient) (int64, error) {
 func RecipientPut(id int64, recipient Recipient) (Recipient, error) {
 
 	_, err := DB.Exec(`UPDATE public.tbbeneficiario
-		SET nome=$1, data_nacimento=$2, profissao=$3, documento_rg=$4, documento_cpf=$5, documento_cpts=$6, documento_pis=$7, 
-		contato_tel=$8, contato_cel=$9, endereco=$10, dependente_nome=$11, dependente_documento=$12, dependente_1_nome=$13, 
-		dependente_2_nome=$14, paga_aluguel=$15, aposentado=$16, bolsa_familia=$17, qtde_pessoas_trabalham=$18, 
-		qtde_pessoas_casa=$19, qtde_leite=$20, qtde_bebe=$21, qtde_meninos=$22, qtde_meninas=$23, ativo=$24
+		SET nome=$2, data_nacimento=$3, profissao=$4, documento_rg=$5, documento_cpf=$6, documento_cpts=$7, documento_pis=$8, 
+		contato_tel=$9, contato_cel=$10, endereco=$11, dependente_nome=$12, dependente_documento=$13, dependente_1_nome=$14, 
+		dependente_2_nome=$15, paga_aluguel=$16, aposentado=$17, bolsa_familia=$18, qtde_pessoas_trabalham=$19, 
+		qtde_pessoas_casa=$20, qtde_leite=$21, qtde_bebe=$22, qtde_meninos=$23, qtde_meninas=$24, ativo=$25
 		WHERE id=$1`,
 		id,
 		recipient.Name,
@@ -229,7 +229,8 @@ func RecipientPut(id int64, recipient Recipient) (Recipient, error) {
 		recipient.Milks,
 		recipient.Babys,
 		recipient.Boys,
-		recipient.Girls)
+		recipient.Girls,
+		recipient.Active)
 	if err != nil {
 		log.Println("Erro lendo datados:", err)
 		return Recipient{}, err

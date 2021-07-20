@@ -82,12 +82,13 @@ func PutRecipient(c *gin.Context) {
 
 	log.Printf("Controller: (recipient) - Put: Body In= %+v\n", data)
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	_, err := models.RecipientPut(id, data)
+	recipient, err := models.RecipientPut(id, data)
 	if err != nil {
 		log.Println("Controller: (recipient) - Put: Error=", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	log.Printf("Controller: (recipient) - Put: Body Out= \n")
-	c.JSON(201, gin.H{})
+
+	c.JSON(200, recipient)
 }
