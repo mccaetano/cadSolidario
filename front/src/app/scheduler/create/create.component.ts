@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { SchedulerService } from '../scheduler.service';
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { Scheduler } from "../scheduler";
+import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { defineLocale, ptBrLocale } from 'ngx-bootstrap/chronos';
 
 @Component({
   selector: 'app-create',
@@ -13,8 +15,14 @@ export class CreateComponent implements OnInit {
 
   constructor(
     public schedulerService: SchedulerService,
-    public modalRef: BsModalRef)
-    { this.scheduler = {};  }
+    public modalRef: BsModalRef,
+    private localeService: BsLocaleService) {
+      defineLocale('pt-br', ptBrLocale);    
+      this.localeService.use('pt-br');
+      
+      
+      this.scheduler = {};  
+    }
 
   ngOnInit(): void {
   }

@@ -2,11 +2,11 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { Recipient } from '../recipient';
 import { RecipientService } from '../recipient.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-
+import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { defineLocale, ptBrLocale } from 'ngx-bootstrap/chronos';
 
 @Component({
   selector: 'app-view',
@@ -21,7 +21,15 @@ export class ViewComponent implements OnInit {
   selRecipientId: number = 0;
   modalRef: BsModalRef | any;
 
-  constructor(public recipientService: RecipientService, private formBuilder: FormBuilder, private router: Router, private modalService: BsModalService) {
+  constructor(public recipientService: RecipientService, 
+    private formBuilder: FormBuilder, 
+    private router: Router, 
+    private modalService: BsModalService,
+    private localeService: BsLocaleService) {
+    
+    defineLocale('pt-br', ptBrLocale);
+    this.localeService.use('pt-br');
+
     this.form = this.formBuilder.group({
       id: [''],
       name: [''],
@@ -85,7 +93,7 @@ export class ViewComponent implements OnInit {
           dependents2Name: data.dependents?.[2].name ?? "",
           retiree: data.retiree ?? false,
           rentPay: data.rentPay ?? false,
-          working: data.working ?? false,
+          working: data.working ?? 0,
           homePeaples: data.homePeaples ?? 0,
           milks: data.milks ?? 0,
           babys: data.babys ?? 0,
@@ -150,13 +158,11 @@ export class ViewComponent implements OnInit {
       homePeaples: Number(this.form.get("homePeaples")?.value ?? 0)
     };
     console.log("Update: id: " + this.selRecipientId + ", body" + JSON.stringify(recipient));
-    this.recipientService.update(this.selRecipientId, recipient).pipe(
-      catchError(this.errorHandler)
-    );
-    console.log("Finins update");
-    this.selRecipientId = 0;
-    
-    this.form.reset;
+    this.recipientService.update(this.selRecipientId, recipient).subscribe( res => {
+      console.log("Finins update");
+      this.selRecipientId = 0;    
+      this.form.reset;
+    });    
 
   }
  
@@ -171,7 +177,7 @@ export class ViewComponent implements OnInit {
     } else {
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
-    console.log("error: " + errorMessage);    
+    console.error(errorMessage);    
     return throwError(errorMessage);
  }
 }

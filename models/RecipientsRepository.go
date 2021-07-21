@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"strings"
 )
 
 type Contact struct {
@@ -127,9 +128,9 @@ func RecipientGetByFilter(name string, limit int32, skip int32) ([]Recipient, er
 			from
 				public.tbbeneficiario 
 			where 
-				nome  like '%' || $1 || '%'
+				lower(nome)  like '%' || $1 || '%'
 			limit $2 offset $3`,
-		name,
+		strings.ToLower(name),
 		limit,
 		offset)
 	if err != nil {
@@ -161,15 +162,15 @@ func RecipientGetByFilter(name string, limit int32, skip int32) ([]Recipient, er
 	return recipients, nil
 }
 
-func RecipientPost(recipient Recipient) (int64, error) {
-	var id int64
+func RecipientPost(recipient Recipient) (int, error) {
+	id := 0
 
-	DB.QueryRow(`INSERT INTO public.tbbeneficiario
+	err := DB.QueryRow(`INSERT INTO tbbeneficiario
 		(nome, data_nacimento, profissao, documento_rg, documento_cpf, documento_cpts, 
 		documento_pis, contato_tel, contato_cel, endereco, dependente_nome, dependente_documento, dependente_1_nome, dependente_2_nome, 
 		paga_aluguel, aposentado, bolsa_familia, qtde_pessoas_trabalham, qtde_pessoas_casa, qtde_leite, qtde_bebe, qtde_meninos,
 		qtde_meninas, ativo)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, true);
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, true)
 		RETURNING id`,
 		recipient.Name,
 		recipient.Birthdate,
@@ -194,7 +195,10 @@ func RecipientPost(recipient Recipient) (int64, error) {
 		recipient.Babys,
 		recipient.Boys,
 		recipient.Girls).Scan(&id)
-
+	if err != nil {
+		log.Println("Erro ao inserir dados:", err)
+		return -1, err
+	}
 	return id, nil
 }
 

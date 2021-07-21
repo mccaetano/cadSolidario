@@ -63,14 +63,14 @@ func PostRecipient(c *gin.Context) {
 	}
 	log.Printf("Controller: (recipient) - Post: Body In= %+v\n", data)
 
-	_, err = models.RecipientPost(data)
+	id, err := models.RecipientPost(data)
 	if err != nil {
 		log.Println("Controller: (recipient) - Post: Error=", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	log.Printf("Controller: (recipient) - Post: Body Out= \n")
+	log.Printf("Controller: (recipient) - Post: Body Out= %d\n", id)
 	c.Header("Content-type", "application/json")
 	c.JSON(201, gin.H{})
 }

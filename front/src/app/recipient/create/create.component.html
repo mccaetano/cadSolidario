@@ -12,7 +12,7 @@
   </div>
 </div>
 <div class="row">
-  <form [formGroup]="form" (ngSubmit)="criar()">
+  <form [formGroup]="form">
     <div class="row">
       <div class="form-group">
         <label for="name">Nome:</label>
@@ -242,13 +242,15 @@
         />
       </div>
       <div class="col-md-4">
-        <label for="helpFamily">Bolsa Familia:</label>
-        <input
-          formControlName="helpFamily"
-          id="helpFamily"
-          type="text"
-          class="form-control"
-        />
+        <div class="form-check">
+          <label for="helpFamily" class="form-check-label">Bolsa Familia:</label>
+          <input
+            formControlName="helpFamily"
+            id="helpFamily"
+            type="checkbox"
+            class="form-check-input"
+          />
+      </div>
       </div>
     </div>
     <div class="row g-3">
@@ -265,7 +267,14 @@
     </div>
   </div>
     <div class="form-group">
-      <button class="btn btn-success" type="submit">Salvar</button>
+      <button class="btn btn-success" (click)="openModal(template)">Salvar</button>
     </div>
   </form>
 </div>
+<ng-template #template>
+  <div class="modal-body text-center">
+    <p>Confirma Inclusão?</p>
+    <button type="button" class="btn btn-success" (click)="confirm()" >Sim</button>
+    <button type="button" class="btn btn-secondary" (click)="decline()" >Não</button>
+  </div>
+</ng-template>

@@ -1,12 +1,12 @@
 <div class="row">
-  <div class="col">
+  <div class="col-md-8">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item active" aria-current="page">Home</li>
       </ol>
     </nav>
   </div>
-  <div class="col float-right">
+  <div class="col-md-4">
     <button  class="btn btn-primary" (click)="openModalCreate()">Adicionar Agenda</button>
   </div>
 </div>
@@ -44,7 +44,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let scheduler of schedulers">
+        <tr *ngFor="let scheduler of schedulers" [ngClass]="{'red': scheduler.status?.id == 8}">
           <td>{{ scheduler.name }}</td>
           <td>{{ scheduler.documents?.cpf }}</td>
           <td>{{ scheduler.contacts?.phone }}</td>

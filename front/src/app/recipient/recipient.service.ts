@@ -34,15 +34,14 @@ export class RecipientService {
     )
   }
 
-  create(recipient: Recipient): Observable<Recipient> {
-    
-    return this.httpClient.post<Recipient>(this.apiURL + '/recipient', JSON.stringify(recipient), this.httpOptions)
+  create(recipient: Recipient): Observable<string> {
+    return this.httpClient.post<string>(this.apiURL + '/recipient', JSON.stringify(recipient), this.httpOptions)
     .pipe(
       catchError(this.errorHandler)
     )
   }
 
-  update(id: number, recipient: Recipient): Observable<Recipient> {
+  update(id: number, recipient: Recipient): Observable<Recipient> {    
     return this.httpClient.put<Recipient>(this.apiURL + '/recipient/' + id, JSON.stringify(recipient), this.httpOptions)
     .pipe(
       catchError(this.errorHandler)

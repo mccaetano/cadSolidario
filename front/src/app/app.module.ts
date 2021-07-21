@@ -10,7 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RecipientModule } from './recipient/recipient.module';
 import { SchedulerModule } from "./scheduler/scheduler.module";
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons';
-
+import { registerLocaleData } from '@angular/common';
 
 @NgModule({
   declarations: [
